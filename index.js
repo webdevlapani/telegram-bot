@@ -23,7 +23,8 @@ app.post(URI, async (req, res) => {
   console.log(req.body);
 
   let message = "";
-  const chatId = "@mybotesting";
+  const channelId = "@mybotesting";
+  const chatId = req.body.message.chat.id;
   const text = req.body.message?.text;
   const poll = req.body.message?.poll;
   const photo = req.body.message?.photo;
@@ -32,39 +33,38 @@ app.post(URI, async (req, res) => {
   try {
     if (text) {
       await axios.post(`${TELEGRAM_API}/sendMessage`, {
-        chat_id: chatId,
+        chat_id: channelId,
         text,
       });
-      message =
-        "your text message succesfully sended to @mybotesting channel";
+      message = "your text message succesfully sended to @mybotesting channel";
     } else if (poll) {
       await axios.post(`${TELEGRAM_API}/sendPoll`, {
-        chat_id: chatId,
+        chat_id: channelId,
         question: poll.question,
         options: poll.options.map((item) => item.text),
       });
       message = "your poll succesfully sended to @mybotesting channel";
     } else if (photo) {
       await axios.post(`${TELEGRAM_API}/sendPhoto`, {
-        chat_id: chatId,
-        photo: photo[0]?.file_id,
+        chat_id: channelId,
+        photo: photo[0].file_id,
       });
       message = "your photo succesfully sended to @mybotesting channel";
     } else if (video) {
       await axios.post(`${TELEGRAM_API}/sendVideo`, {
-        chat_id: chatId,
-        video: video?.file_id,
+        chat_id: channelId,
+        video: video.file_id,
       });
       message = "your video succesfully sended to @mybotesting channel";
     }
   } catch (err) {
-    console.log("🚀 ~ file: index.js:31 ~ app.post ~ err:", err);
+    console.log("🚀 ~ err:", err);
     message =
       "something went wrong, we are not send your message to any channel";
   }
 
   await axios.post(`${TELEGRAM_API}/sendMessage`, {
-    chat_id: req.body?.message?.chat?.id,
+    chat_id: chatId,
     text: message,
   });
 
